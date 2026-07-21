@@ -1,0 +1,107 @@
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "sync"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Client {
+  // --- Existing Foundation ---
+  id           String    @id @default(uuid())
+  name         String    // Satisfies PDF 'company_name'
+  email        String    @unique // Satisfies PDF 'client_email'
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  projects     Project[]
+  
+  // --- New PDF Additions ---
+  package_tier String?   // Module 1, 2, or 3 (Optional so it doesn't break old entries)
+}
+
+// --- NEW PDF TABLE ---
+model Freelancer {
+  id             String    @id @default(uuid())
+  name           String
+  email          String    @unique
+  passwordHash   String
+  specialization String    // Visual Architect, CMF Strategist, etc.
+  projects       Project[]
+}
+
+model Project {
+  // --- Existing Foundation ---
+  id                 String   @id @default(uuid())
+  name               String
+  stage              String   @default("Discovery")
+  progress           Int      @default(0)
+  createdAt          DateTime @default(now())
+  clientId           String
+  client             Client   @relation(fields: [clientId], references: [id])
+  updates            Update[]
+  events             Event[]
+  tasks              Task[]
+
+  // --- New PDF Additions ---
+  project_code_name  String?  
+  current_status     String   @default("Onboarding")
+  countdown_deadline DateTime? 
+  
+  freelancerId       String?
+  freelancer         Freelancer? @relation(fields: [freelancerId], references: [id])
+  
+  deliverables       Deliverable[]
+}
+
+// --- NEW PDF TABLE ---
+model Deliverable {
+  id                    String   @id @default(uuid())
+  uploaded_by_role      String   // Admin, Freelancer, or Client
+  file_name             String
+  file_path_or_url      String
+  is_released_to_client Boolean  @default(false) 
+  
+  projectId             String
+  project               Project  @relation(fields: [projectId], references: [id])
+}
+
+// --------------------------------------------------
+// YOUR ORIGINAL TRACKERS (UNTOUCHED)
+// --------------------------------------------------
+model Update {
+  id        String   @id @default(uuid())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  type        String
+  eventDate   DateTime
+  description String?
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  description String
+  isComplete  Boolean  @default(false)
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+}
