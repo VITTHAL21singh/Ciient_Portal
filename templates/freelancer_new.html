@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Add New Freelancer</h2>
+    <form method="POST" style="display: flex; flex-direction: column; gap: 12px; max-width: 400px;">
+        <input type="text" name="name" placeholder="Freelancer Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Temporary Password" required>
+        
+        <label for="specialization" style="font-size: 14px; color: #666;">Specialization:</label>
+        <select name="specialization" id="specialization">
+            <option value="Visual Architect">Visual Architect</option>
+            <option value="CMF Strategist">CMF Strategist</option>
+            <option value="Market Researcher">Market Researcher</option>
+        </select>
+        
+        <button type="submit" class="btn" style="background: #1A1A1A; color: #FFF; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Create Freelancer</button>
+    </form>
+</div>
+{% endblock %}

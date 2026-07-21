@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 0 auto; font-family: sans-serif;">
+    
+    <!-- HEADER -->
+    <div style="margin-bottom: 40px; border-bottom: 1px solid #E5E5E5; padding-bottom: 20px;">
+        <h1 style="color: #1A1A1A; margin-bottom: 5px;">Welcome, {{ client.name }}</h1>
+        <p style="color: #666; font-size: 14px; margin: 0;">Active Package: {{ client.package_tier or 'Standard' }}</p>
+    </div>
+
+    {% for project in client.projects %}
+    <div style="margin-bottom: 60px;">
+        <h2 style="color: #1A1A1A; margin-bottom: 20px;">{{ project.name }}</h2>
+        
+        <!-- SECTION 1: CURRENT STATUS & MILESTONES -->
+        <div style="border: 1px solid #E5E5E5; border-radius: 6px; padding: 24px; margin-bottom: 24px; background: #FFF;">
+            <h3 style="margin-top: 0; color: #1A1A1A; border-bottom: 1px solid #FAFAFA; padding-bottom: 10px;">Current Status: {{ project.stage }}</h3>
+            
+            <div style="margin: 20px 0;">
+                <div style="width: 100%; background-color: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 4px; height: 10px; overflow: hidden;">
+                    <div style="height: 100%; background-color: #1A1A1A; width: {{ project.progress }}%;"></div>
+                </div>
+                <p style="text-align: right; font-size: 12px; color: #666; margin-top: 5px;">{{ project.progress }}% Complete</p>
+            </div>
+
+            <h4 style="color: #666; margin-top: 30px;">Latest Advisory Notes</h4>
+            {% for update in project.updates %}
+                <div style="padding: 16px; border-left: 2px solid #1A1A1A; background: #FAFAFA; margin-bottom: 12px;">
+                    <span style="font-size: 11px; color: #666;">{{ update.createdAt.strftime('%b %d, %Y') }}</span>
+                    <strong style="display: block; margin-top: 4px; color: #1A1A1A;">{{ update.title }}</strong>
+                    <p style="margin-top: 4px; font-size: 14px; color: #333;">{{ update.body }}</p>
+                </div>
+            {% else %}
+                <p style="font-size: 13px; color: #666;">No advisory notes yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- SECTION 2: UPLOAD VAULT -->
+        <div style="border: 1px solid #E5E5E5; border-radius: 6px; padding: 24px; margin-bottom: 24px; background: #FFF;">
+            <h3 style="margin-top: 0; color: #1A1A1A;">Upload Vault</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 16px;">Please upload product photos, current catalog vector source assets, and factory CAD data here via secure link.</p>
+            
+            <form action="{{ url_for('client_upload', project_id=project.id) }}" method="POST" style="display: flex; gap: 10px; margin-bottom: 24px;">
+                <input type="text" name="file_name" placeholder="Asset Name" required style="flex: 1; padding: 10px; border: 1px solid #E5E5E5; border-radius: 4px;">
+                <input type="text" name="file_url" placeholder="Secure Link URL (Drive, Dropbox, S3)..." required style="flex: 2; padding: 10px; border: 1px solid #E5E5E5; border-radius: 4px;">
+                <button type="submit" style="background: #FAFAFA; color: #1A1A1A; border: 1px solid #E5E5E5; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Upload Asset</button>
+            </form>
+
+            <h4 style="color: #666; font-size: 14px; border-bottom: 1px solid #FAFAFA; padding-bottom: 8px;">Your Recent Uploads</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for doc in project.deliverables %}
+                    {% if doc.uploaded_by_role == 'Client' %}
+                    <li style="padding: 12px; border-bottom: 1px solid #FAFAFA; display: flex; justify-content: space-between;">
+                        <strong style="color: #1A1A1A; font-size: 14px;">{{ doc.file_name }}</strong>
+                        <a href="{{ doc.file_path_or_url }}" target="_blank" style="font-size: 13px; color: #666; text-decoration: underline;">Verify Link</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- SECTION 3: FINAL DELIVERABLES -->
+        <div style="border: 1px solid #E5E5E5; border-radius: 6px; padding: 24px; background: #FFF;">
+            <h3 style="margin-top: 0; color: #1A1A1A;">Final Deliverables</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 16px;">Approved strategic playbook deliverables and final assets ready for download.</p>
+            
+            <ul style="list-style: none; padding: 0;">
+                {% for doc in project.deliverables %}
+                    {% if doc.is_released_to_client and doc.uploaded_by_role != 'Client' %}
+                    <li style="padding: 16px; border: 1px solid #E5E5E5; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; background: #FAFAFA;">
+                        <strong style="color: #1A1A1A;">{{ doc.file_name }}</strong>
+                        <a href="{{ doc.file_path_or_url }}" target="_blank" style="background: #1A1A1A; color: #FFF; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Access Deliverable</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                    <li style="font-size: 13px; color: #666;">No finalized deliverables have been released yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; border: 1px dashed #E5E5E5; border-radius: 6px; color: #666;">
+        Your account is active, but no projects have been assigned yet.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

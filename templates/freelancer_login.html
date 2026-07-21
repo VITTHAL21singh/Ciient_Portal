@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 400px; margin: 80px auto; font-family: 'Inter', sans-serif;">
+    <h2 style="margin-bottom: 8px; font-size: 24px;">Freelancer Workspace</h2>
+    <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 15px;">Production staff sign in</p>
+
+    <!-- Error/Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div style="background: #FAFAFA; border-left: 4px solid var(--text-main); padding: 12px; margin-bottom: 20px; border-radius: 4px;">
+        {% for message in messages %}
+          <p style="color: var(--text-main); margin: 0; font-size: 14px; font-weight: 600;">{{ message }}</p>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" style="padding: 32px; gap: 8px;">
+        <label style="font-size: 14px; font-weight: 600; color: var(--text-main);">Email</label>
+        <input type="email" name="email" required style="margin-bottom: 16px;">
+        
+        <label style="font-size: 14px; font-weight: 600; color: var(--text-main);">Password</label>
+        <input type="password" name="password" required style="margin-bottom: 24px;">
+        
+        <button type="submit" style="width: 100%;">Sign in</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-muted);">
+        <a href="{{ url_for('client_login') }}" style="color: var(--text-muted); text-decoration: underline; margin-right: 12px;">Client sign in</a>
+        <a href="{{ url_for('admin_login') }}" style="color: var(--text-muted); text-decoration: underline;">Admin sign in</a>
+    </div>
+</div>
+{% endblock %}

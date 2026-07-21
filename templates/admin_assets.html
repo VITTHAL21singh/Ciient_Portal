@@ -1,0 +1,53 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+<style>
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding-bottom: 16px; border-bottom: 1px solid #E5E7EB; color: #111827; font-weight: 600; font-size: 14px; }
+    td { padding: 16px 0; border-bottom: 1px solid #F3F4F6; font-size: 14px; color: #4B5563; }
+    tr:last-child td { border-bottom: none; padding-bottom: 0; }
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+    .badge-released { background: #DCFCE7; color: #16A34A; }
+    .badge-pending { background: #FEF9C3; color: #CA8A04; }
+</style>
+
+<div class="header-row">
+    <h1 style="margin: 0; font-size: 32px; letter-spacing: -0.04em;">Asset Management</h1>
+</div>
+
+<div class="ui-card">
+    <table>
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Project</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th style="text-align: right;">Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td style="font-weight: 500; color: #111827;">{{ asset.file_name }}</td>
+                <td>{{ asset.project.name }}</td>
+                <td>{{ asset.uploaded_by_role }}</td>
+                <td>
+                    {% if asset.is_released_to_client %}
+                        <span class="badge badge-released">Released</span>
+                    {% else %}
+                        <span class="badge badge-pending">Pending</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <a href="{{ asset.file_path_or_url }}" target="_blank" style="color: #3B82F6; text-decoration: none; font-weight: 500;">View &rarr;</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 24px 0;">No assets currently in the database.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

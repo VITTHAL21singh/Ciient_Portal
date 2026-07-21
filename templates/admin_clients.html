@@ -1,0 +1,15 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+<div class="header-row">
+    <h1 style="margin: 0; font-size: 32px; letter-spacing: -0.04em;">Client Database</h1>
+    <a href="{{ url_for('new_client') }}" class="btn-dark"><span>+</span> New Client</a>
+</div>
+<div class="ui-card">
+    <p style="color: #6B7280; font-size: 14px;">Client list populated from database...</p>
+    {% for client in clients %}
+        <div style="padding: 12px 0; border-bottom: 1px solid #F3F4F6;">
+            <strong>{{ client.name }}</strong> ({{ client.email }})
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

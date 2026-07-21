@@ -1,0 +1,14 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+<div class="header-row">
+    <h1 style="margin: 0; font-size: 32px; letter-spacing: -0.04em;">All Projects</h1>
+</div>
+<div class="ui-card">
+    <p style="color: #6B7280; font-size: 14px;">Project database list...</p>
+    {% for project in projects %}
+        <div style="padding: 12px 0; border-bottom: 1px solid #F3F4F6;">
+            <strong>{{ project.name }}</strong> | Stage: {{ project.stage }}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

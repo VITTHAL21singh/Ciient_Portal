@@ -1,0 +1,47 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+<style>
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding-bottom: 16px; border-bottom: 1px solid #E5E7EB; color: #111827; font-weight: 600; font-size: 14px; }
+    td { padding: 16px 0; border-bottom: 1px solid #F3F4F6; font-size: 14px; color: #4B5563; }
+    tr:last-child td { border-bottom: none; padding-bottom: 0; }
+    .roster-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 600; }
+</style>
+
+<div class="header-row">
+    <h1 style="margin: 0; font-size: 32px; letter-spacing: -0.04em;">Production Roster</h1>
+    <a href="{{ url_for('new_freelancer') }}" class="btn-dark"><span>+</span> New Freelancer</a>
+</div>
+
+<div class="ui-card">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Specialization</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for freelancer in freelancers %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="roster-avatar" style="background: {% if 'Visual' in freelancer.specialization %}#E0E7FF{% else %}#DCFCE7{% endif %}; color: {% if 'Visual' in freelancer.specialization %}#4F46E5{% else %}#16A34A{% endif %};">
+                            {{ freelancer.name[:2] | upper }}
+                        </div>
+                        <span style="font-weight: 500; color: #111827;">{{ freelancer.name }}</span>
+                    </div>
+                </td>
+                <td>{{ freelancer.email }}</td>
+                <td>{{ freelancer.specialization }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 24px 0;">No freelancers currently in the roster.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

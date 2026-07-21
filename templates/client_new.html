@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Add New Client</h2>
+    <form method="POST" style="display: flex; flex-direction: column; gap: 12px; max-width: 400px;">
+        <input type="text" name="name" placeholder="Company Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Temporary Password" required>
+        
+        <label for="package_tier" style="font-size: 14px; color: #666;">Package Tier:</label>
+        <select name="package_tier" id="package_tier">
+            <option value="Module 1">Module 1</option>
+            <option value="Module 2">Module 2</option>
+            <option value="Module 3">Module 3</option>
+        </select>
+        
+        <button type="submit">Create Client</button>
+    </form>
+</div>
+{% endblock %}

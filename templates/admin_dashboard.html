@@ -1,0 +1,50 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+<style>
+    .card-top { display: flex; justify-content: space-between; font-size: 15px; color: #111827; }
+    .divider { border-top: 1px dashed #E5E7EB; margin: 16px 0; }
+    .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+    .progress-track { background: #E5E7EB; height: 8px; border-radius: 4px; width: 220px; margin: 12px 0; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; background: #111827; }
+    .progress-fill.blue { background: #3B82F6; } 
+</style>
+
+<div class="header-row">
+    <h1 style="margin: 0; font-size: 32px; letter-spacing: -0.04em;">Master Command Center</h1>
+    <div style="display: flex; gap: 12px;">
+        <a href="{{ url_for('new_client') }}" class="btn-dark"><span>+</span> New Client</a>
+        <a href="{{ url_for('new_freelancer') }}" class="btn-dark"><span>+</span> New Freelancer</a>
+    </div>
+</div>
+
+<h3 style="margin-bottom: 24px; font-size: 18px; letter-spacing: -0.02em;">Active Consultancy Pipeline</h3>
+
+{% for client in clients %}
+    {% for project in client.projects %}
+    <div class="ui-card">
+        <div class="card-top">
+            <div>Company: <span style="font-weight: 400; color: #4B5563;">{{ client.name }}</span></div>
+            <div>Tier: <span style="font-weight: 400; color: #4B5563;">{{ client.package_tier or 'N/A' }}</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="card-bottom">
+            <div>
+                <h3 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700;">{{ project.name }}</h3>
+                <div style="font-size: 14px; color: #6B7280;">Assigned: {% if project.freelancer %}{{ project.freelancer.name }}{% else %}Unassigned{% endif %}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 14px; font-weight: 500; color: #111827;">{{ project.stage }} ({{ project.progress }}%)</div>
+                <div class="progress-track">
+                    <div class="progress-fill {% if project.progress < 80 %}blue{% endif %}" style="width: {{ project.progress }}%;"></div>
+                </div>
+                <form action="{{ url_for('project_detail', project_id=project.id) }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="btn-dark" style="padding: 8px 16px !important; font-size: 13px !important; margin-top: 4px;">Open Review Room &rsaquo;</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p style="color: #6B7280; font-size: 14px;">No active projects in the pipeline.</p>
+{% endfor %}
+{% endblock %}

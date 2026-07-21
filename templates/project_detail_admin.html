@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>{{ project.name }} {% if project.project_code_name %}<span style="color: #666; font-size: 18px;">({{ project.project_code_name }})</span>{% endif %}</h2>
+        <a href="{{ url_for('admin_dashboard') }}" style="color: #666; text-decoration: none;">← Back to Command Center</a>
+    </div>
+
+    <!-- 1. THE REVIEW ROOM (Deliverables Vault) -->
+    <div style="margin-bottom: 40px; padding: 20px; border: 1px solid #1A1A1A; border-radius: 6px; background: #FAFAFA;">
+        <h3 style="margin-top: 0; color: #1A1A1A;">The Review Room (Deliverables)</h3>
+        
+        <!-- Freelancer Submissions (Hidden from Client) -->
+        <h4 style="border-bottom: 1px solid #E5E5E5; padding-bottom: 8px; color: #666;">Drafts & Submissions (Internal)</h4>
+        <ul style="list-style: none; padding: 0;">
+            {% for doc in project.deliverables %}
+                {% if not doc.is_released_to_client %}
+                <li style="padding: 12px; border: 1px solid #E5E5E5; background: #FFF; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>{{ doc.file_name }}</strong> <span style="font-size: 12px; color: #666; background: #EEE; padding: 2px 6px; border-radius: 4px;">{{ doc.uploaded_by_role }}</span><br>
+                        <a href="{{ doc.file_path_or_url }}" target="_blank" style="font-size: 13px; color: blue;">View Asset Link</a>
+                    </div>
+                    
+                    <!-- THE MAGIC RELEASE TOGGLE -->
+                    <form action="{{ url_for('release_deliverable', deliverable_id=doc.id) }}" method="POST" style="margin: 0;">
+                        <button type="submit" style="background: #1A1A1A; color: #FFF; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Release to Client View</button>
+                    </form>
+                </li>
+                {% endif %}
+            {% else %}
+                <li style="font-size: 13px; color: #666;">No unreleased drafts currently in the vault.</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Live Client Assets -->
+        <h4 style="border-bottom: 1px solid #E5E5E5; padding-bottom: 8px; margin-top: 30px; color: #666;">Live Client Assets</h4>
+        <ul style="list-style: none; padding: 0;">
+            {% for doc in project.deliverables %}
+                {% if doc.is_released_to_client %}
+                <li style="padding: 12px; border: 1px solid #E5E5E5; background: #FFF; margin-bottom: 8px; border-radius: 4px;">
+                    <strong>{{ doc.file_name }}</strong> <span style="font-size: 12px; color: #666;">(Live in Portal)</span><br>
+                    <a href="{{ doc.file_path_or_url }}" target="_blank" style="font-size: 13px; color: blue;">View Asset Link</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <!-- Admin Manual Upload Form -->
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #E5E5E5;">
+            <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Manually add an asset link (Figma, S3, etc.) to the vault:</p>
+            <form action="{{ url_for('submit_deliverable', project_id=project.id) }}" method="POST" style="display: flex; gap: 10px;">
+                <input type="text" name="file_name" placeholder="Asset Name" required style="flex: 1;">
+                <input type="text" name="file_url" placeholder="https://link-to-file..." required style="flex: 2;">
+                <button type="submit" class="btn" style="background: #E5E5E5; border: none; padding: 8px 16px; border-radius: 4px;">Add to Vault</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. PROJECT STAGE & PROGRESS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px;">
+        <div style="padding: 20px; border: 1px solid #E5E5E5; border-radius: 6px;">
+            <h3>Stage & Progress</h3>
+            <form action="{{ url_for('update_stage', project_id=project.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="font-size: 14px; color: #666;">Current Stage</label>
+                <select name="stage">
+                    {% for stage in stages %}
+                    <option value="{{ stage }}" {% if project.stage == stage %}selected{% endif %}>{{ stage }}</option>
+                    {% endfor %}
+                </select>
+                
+                <label style="font-size: 14px; color: #666;">Progress %</label>
+                <input type="number" name="progress" value="{{ project.progress }}" min="0" max="100">
+                
+                <button type="submit" style="background: #1A1A1A; color: #FFF; padding: 8px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Save Status</button>
+            </form>
+        </div>
+
+        <div style="padding: 20px; border: 1px solid #E5E5E5; border-radius: 6px;">
+            <h3>Schedule Event</h3>
+            <form action="{{ url_for('new_event', project_id=project.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" name="title" placeholder="Event Title" required>
+                <select name="type">
+                    <option>Meeting</option>
+                    <option>Deadline</option>
+                    <option>Milestone</option>
+                </select>
+                <input type="datetime-local" name="eventDate" required>
+                <button type="submit" style="background: #1A1A1A; color: #FFF; padding: 8px; border: none; border-radius: 4px; cursor: pointer;">Add to Calendar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. TIMELINE & UPDATES -->
+    <div style="padding: 20px; border: 1px solid #E5E5E5; border-radius: 6px;">
+        <h3>Post Timeline Update</h3>
+        <form action="{{ url_for('new_update', project_id=project.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
+            <input type="text" name="title" placeholder="Update Title" required>
+            <textarea name="body" rows="3" placeholder="Message to client..." required style="padding: 8px;"></textarea>
+            <button type="submit" style="background: #1A1A1A; color: #FFF; padding: 8px; border: none; border-radius: 4px; cursor: pointer; width: 150px;">Post Update</button>
+        </form>
+
+        <h4 style="border-bottom: 1px solid #E5E5E5; padding-bottom: 8px;">Previous Updates</h4>
+        {% for update in project.updates %}
+            <div style="margin-bottom: 16px; padding-left: 12px; border-left: 2px solid #1A1A1A;">
+                <span style="font-size: 11px; color: #666;">{{ update.createdAt.strftime('%b %d, %Y') }}</span>
+                <strong style="display: block; margin-top: 4px;">{{ update.title }}</strong>
+                <p style="margin-top: 4px; font-size: 14px; color: #333;">{{ update.body }}</p>
+            </div>
+        {% else %}
+            <p style="font-size: 13px; color: #666;">No updates posted yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
