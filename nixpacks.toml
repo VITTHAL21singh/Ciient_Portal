@@ -2,5 +2,5 @@
 python = {}
 
 [phases.setup]
-nixPkgs = ["...", "nodejs"]
-aptPkgs = ["...", "libatomic1"]
+nixPkgs = ["nodejs"]
+aptPkgs = ["libatomic1"]
