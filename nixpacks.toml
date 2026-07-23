@@ -1,2 +1,6 @@
+[providers]
+python = {}
+
 [phases.setup]
+nixPkgs = ["...", "nodejs"]
 aptPkgs = ["...", "libatomic1"]
